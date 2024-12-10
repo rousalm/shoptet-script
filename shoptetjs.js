@@ -1,73 +1,95 @@
 document.addEventListener('DOMContentLoaded', function () {
     const body = document.querySelector('body');
     const currentPath = window.location.pathname;
+    const deliveryBox = document.querySelector('.dklab-delivery-box.position-above-header');
+
+    // delivery box viditelnÃ½
+    const categoryPaths = [
+        '/sirupy/',
+        '/sirupy-2/',
+        '/kava/',
+        '/karamely/',
+        '/recepty/',
+        '/limitky/',
+    ];
 
     if (body) {
-        // Titulní stránka 
+        // ÃºvodnÃ­ strÃ¡nka
         if (currentPath === '/') {
-            console.log('Titulní stránka, ádné zmìny pro menu');
+            console.log('TitulnÃ­ strÃ¡nka, zobrazujeme delivery box');
             body.classList.add('homepage');
             body.classList.remove('other-pages');
+
+            if (deliveryBox) {
+                deliveryBox.style.display = 'block';
+            }
         }
-        // Pro všechny ostatní stránky
+        // Pokud je to nÄ›kterÃ¡ z kategoriÃ­
+        else if (categoryPaths.some(path => currentPath.startsWith(path))) {
+            console.log('Na strÃ¡nce kategorie, zobrazujeme delivery box');
+            body.classList.add('homepage');
+            body.classList.remove('other-pages');
+
+            if (deliveryBox) {
+                deliveryBox.style.display = 'block';
+            }
+        }
+        // Pokud je to konkrÃ©tnÃ­ strÃ¡nka produktu nebo jinÃ¡ strÃ¡nka
         else {
-            console.log('Ostatní stránka, pøidám tøídu "other-pages"');
+            console.log('Na strÃ¡nce produktu nebo jinÃ© strÃ¡nce, skrÃ½vÃ¡me delivery box');
             body.classList.add('other-pages');
             body.classList.remove('homepage');
+
+            if (deliveryBox) {
+                deliveryBox.style.display = 'none';
+            }
         }
     } else {
         console.log('Body not ready');
     }
-});
 
+    // Detekce scrollu a animace obrÃ¡zkÅ¯
+    const images = document.querySelectorAll('#produkty .col-md-6 img');
+    if (images.length > 0) {
+        window.addEventListener('scroll', () => {
+            images.forEach((img) => {
+                const rect = img.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
 
+                if (rect.top <= windowHeight / 1.5) {
+                    img.parentElement.classList.add('img-visible');
+                }
+            });
+        });
+    } else {
+        console.log('Å½Ã¡dnÃ© obrÃ¡zky nenalezeny v #produkty .col-md-6 img.');
+    }
 
-const images = document.querySelectorAll('#produkty .col-md-6 img');
-
-window.addEventListener('scroll', () => {
-
-    images.forEach((img) => {
-        const rect = img.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-
-
-        if (rect.top <= windowHeight / 1.5) {
-            img.parentElement.classList.add('img-visible');
-        }
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const body = document.body;
+    // SkrytÃ­ navigation-wrapper pÅ™i zobrazenÃ­ modÃ¡lnÃ­ho okna
     const navigationWrapper = document.querySelector('.navigation-wrapper');
     const modalClasses = [
         'search-window-visible',
         'cart-window-visible',
         'login-window-visible',
-        'register-window-visible'
+        'register-window-visible',
     ];
 
-    if (!navigationWrapper) {
-        console.error('Navigation wrapper nebyl nalezen.');
-        return;
-    }
-
-    // Funkce pro kontrolu a úpravu visibility navigation-wrapper
-    function toggleNavigationWrapper() {
-        const isModalVisible = modalClasses.some((className) => body.classList.contains(className));
-        if (isModalVisible) {
-            navigationWrapper.style.display = 'none'; // Skryje navigation-wrapper
-        } else {
-            navigationWrapper.style.display = ''; // Obnoví navigation-wrapper
+    if (navigationWrapper) {
+        function toggleNavigationWrapper() {
+            const isModalVisible = modalClasses.some((className) => body.classList.contains(className));
+            navigationWrapper.style.display = isModalVisible ? 'none' : '';
         }
-    }
 
-    // Sleduj zmìny tøíd na body
-    const observer = new MutationObserver(() => {
+        // Sleduj zmÄ›ny tÅ™Ã­d na body
+        const observer = new MutationObserver(() => {
+            toggleNavigationWrapper();
+        });
+        observer.observe(body, { attributes: true, attributeFilter: ['class'] });
+
+        // SpuÅ¡tÄ›nÃ­ kontroly pÅ™i naÄtenÃ­ strÃ¡nky
         toggleNavigationWrapper();
-    });
-    observer.observe(body, { attributes: true, attributeFilter: ['class'] });
-
-    // Spuštìní kontroly pøi naètení stránky
-    toggleNavigationWrapper();
+    } else {
+        console.error('Navigation wrapper nebyl nalezen.');
+    }
 });
+
